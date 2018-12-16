@@ -289,11 +289,11 @@ PRO flame_checkdata_sky, fuel, i_slit=i_slit
 	; print some stats on wavelength calibration
 	cgtext, 0.10, 0.11, 'wavelength calibration residuals: ', /normal, charsize=0.7
 	cgtext, 0.10, 0.08, 'standard deviation = ' + $
-		cgnumber_formatter( stddev(residuals, /nan), decimals=3) + ' ' + STRING("305B), /normal, charsize=0.7
+		cgnumber_formatter( stddev(residuals, /nan), decimals=3) + ' ' + STRING('305'OB), /normal, charsize=0.7
 	cgtext, 0.10, 0.06, 'root mean square = ' + $
-		cgnumber_formatter( sqrt( mean(residuals^2, /nan)), decimals=3) + ' ' + STRING("305B), /normal, charsize=0.7
+		cgnumber_formatter( sqrt( mean(residuals^2, /nan)), decimals=3) + ' ' + STRING('305'OB), /normal, charsize=0.7
 	cgtext, 0.10, 0.04, 'median absolute deviation = ' + $
-		cgnumber_formatter( median(abs(residuals)), decimals=3) + ' ' + STRING("305B), /normal, charsize=0.7
+		cgnumber_formatter( median(abs(residuals)), decimals=3) + ' ' + STRING('305'OB), /normal, charsize=0.7
 
 
 	; print some stats on spectral resolution
