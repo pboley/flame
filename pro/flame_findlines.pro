@@ -908,97 +908,97 @@ PRO flame_findlines, fuel
 	flame_util_module_start, fuel, 'flame_findlines'
 
 
-  ; avoid printing too much stuff (especially from GAUSSFIT)
-  quiet_state = !QUIET
-  !QUIET = 1
+	; avoid printing too much stuff (especially from GAUSSFIT)
+	quiet_state = !QUIET
+	!QUIET = 1
 
 	; loop through all slits
 	for i_slit=0, n_elements(fuel.slits)-1 do begin
 
-    if fuel.slits[i_slit].skip then continue
+		if fuel.slits[i_slit].skip then continue
 
-	  print, 'Finding emission lines for calibration for slit ', strtrim(fuel.slits[i_slit].number,2), ' - ', fuel.slits[i_slit].name
+		print, 'Finding emission lines for calibration for slit ', strtrim(fuel.slits[i_slit].number,2), ' - ', fuel.slits[i_slit].name
 		print, ' '
 
 		; handle errors by ignoring that slit
 		if fuel.settings.stop_on_error eq 0 then begin
-  		catch, error_status
-  		if error_status ne 0 then begin
-  			print, ''
-        print, ''
-  	    print, '**************************'
-  	    print, '***       WARNING      ***'
-  	    print, '**************************'
-        print, 'Error found. Skipping slit ' + strtrim(fuel.slits[i_slit].number,2), ' - ', fuel.slits[i_slit].name
-        print, ''
-        fuel.slits[i_slit].skip = 1
-  			catch, /cancel
-  			continue
-  		endif
-    endif
+			catch, error_status
+			if error_status ne 0 then begin
+				print, ''
+				print, ''
+				print, '**************************'
+				print, '***       WARNING      ***'
+				print, '**************************'
+				print, 'Error found. Skipping slit ' + strtrim(fuel.slits[i_slit].number,2), ' - ', fuel.slits[i_slit].name
+				print, ''
+				fuel.slits[i_slit].skip = 1
+				catch, /cancel
+				continue
+			endif
+		endif
 
 
 		; this slit
 		this_slit = fuel.slits[i_slit]
 
 
-    ; arcs ---------------------------------------------------------------------
+		; arcs ---------------------------------------------------------------------
 
-    if fuel.util.arc.n_frames GT 0 then begin
+		if fuel.util.arc.n_frames GT 0 then begin
 
-  		; filename of the cutout
-      arc_filename = this_slit.arc_cutout.filename
+			; filename of the cutout
+			arc_filename = this_slit.arc_cutout.filename
 
-  		; identify and measure the speclines
-  		flame_findlines_find_speclines, fuel=fuel, filename=arc_filename, slit=this_slit, $
-      rough_lambda=*this_slit.rough_arclambda, rough_flux=*this_slit.rough_arcflux, $
-      linelist_filename=fuel.settings.linelist_arcs_filename, $
-  			speclines=speclines, wavelength_solution=wavelength_solution
+			; identify and measure the speclines
+			flame_findlines_find_speclines, fuel=fuel, filename=arc_filename, slit=this_slit, $
+			rough_lambda=*this_slit.rough_arclambda, rough_flux=*this_slit.rough_arcflux, $
+			linelist_filename=fuel.settings.linelist_arcs_filename, $
+			speclines=speclines, wavelength_solution=wavelength_solution
 
-  		; save the speclines in the slit structure
-  		*this_slit.arc_cutout.speclines = speclines
+			; save the speclines in the slit structure
+			*this_slit.arc_cutout.speclines = speclines
 
-  		; write a ds9 region file with the identified speclines
-  		flame_findlines_writeds9, speclines, filename=flame_util_replace_string(arc_filename, '.fits', '_speclines.reg')
+			; write a ds9 region file with the identified speclines
+			flame_findlines_writeds9, speclines, filename=flame_util_replace_string(arc_filename, '.fits', '_speclines.reg')
 
 			; use the pixel-by-pixel wavelength solution of the arc frame to set the output grid in wavelength
 			flame_findlines_output_grid, fuel=fuel, wavelength_solution=wavelength_solution, slit=this_slit
 			fuel.slits[i_slit] = this_slit
 
 
-    endif else begin
+		endif else begin
 
-    ; skylines -----------------------------------------------------------------
+		; skylines -----------------------------------------------------------------
 
-  		for i_frame=0, n_elements(fuel.slits[i_slit].cutouts)-1 do begin
+			for i_frame=0, n_elements(fuel.slits[i_slit].cutouts)-1 do begin
 
-  				; filename of the cutout
-  				slit_filename = fuel.slits[i_slit].cutouts[i_frame].filename
+				; filename of the cutout
+				slit_filename = fuel.slits[i_slit].cutouts[i_frame].filename
 
-  				; identify and measure the speclines
-  				flame_findlines_find_speclines, fuel=fuel, filename=slit_filename, slit=this_slit, $
-          rough_lambda=*this_slit.rough_skylambda, rough_flux=*this_slit.rough_skyflux, $
-          linelist_filename=fuel.settings.linelist_sky_filename, $
-  					speclines=speclines, wavelength_solution=wavelength_solution
+				; identify and measure the speclines
+				flame_findlines_find_speclines, fuel=fuel, filename=slit_filename, slit=this_slit, $
+				rough_lambda=*this_slit.rough_skylambda, rough_flux=*this_slit.rough_skyflux, $
+				linelist_filename=fuel.settings.linelist_sky_filename, $
+				speclines=speclines, wavelength_solution=wavelength_solution
 
-  				; save the speclines in the slit structure
-  				*this_slit.cutouts[i_frame].speclines = speclines
+				; save the speclines in the slit structure
+				*this_slit.cutouts[i_frame].speclines = speclines
 
-  				; write a ds9 region file with the identified speclines
-  				flame_findlines_writeds9, speclines, filename=flame_util_replace_string(slit_filename, '.fits', '_speclines.reg')
+				; write a ds9 region file with the identified speclines
+				flame_findlines_writeds9, speclines, filename=flame_util_replace_string(slit_filename, '.fits', '_speclines.reg')
 
-  				; use the pixel-by-pixel wavelength solution OF THE FIRST FRAME to set the output grid in wavelength
-  				if i_frame eq 0 then begin
-  					flame_findlines_output_grid, fuel=fuel, wavelength_solution=wavelength_solution, slit=this_slit
-  					fuel.slits[i_slit] = this_slit
-  				endif
+				; use the pixel-by-pixel wavelength solution OF THE FIRST FRAME to set the output grid in wavelength
+				if i_frame eq 0 then begin
+					flame_findlines_output_grid, fuel=fuel, wavelength_solution=wavelength_solution, slit=this_slit
+					fuel.slits[i_slit] = this_slit
+				endif
 
-  		endfor
+			endfor
 
-      ; diagnostic plot to check the line identification
-      flame_findlines_diagnostics, fuel, this_slit
+			; diagnostic plot to check the line identification
+			flame_findlines_diagnostics, fuel, this_slit
 
-    endelse
+		endelse
 
 	endfor
 
@@ -1006,6 +1006,6 @@ PRO flame_findlines, fuel
 	!QUIET = quiet_state
 
 
-  flame_util_module_end, fuel
+	flame_util_module_end, fuel
 
 END
