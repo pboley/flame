@@ -18,54 +18,54 @@ PRO flame_findlines_writeds9, speclines, filename=filename
 ; write a ds9 region file with all the emission line detections
 ;
 
-  ; extract the wavelength of all identifications
-  line_lambdas = speclines.lambda
-  uniq_lambdas = line_lambdas[UNIQ(line_lambdas, SORT(line_lambdas))]
+	; extract the wavelength of all identifications
+	line_lambdas = speclines.lambda
+	uniq_lambdas = line_lambdas[UNIQ(line_lambdas, SORT(line_lambdas))]
 
-  ; open file
-  openw, lun, filename, /get_lun
+	; open file
+	openw, lun, filename, /get_lun
 
-  ; write header
-  printf, lun, '# Region file format: DS9 version 4.1'
-  printf, lun, 'global dashlist=8 3 width=2 font="helvetica 10 normal roman" select=1 highlite=1 dash=0 fixed=0 edit=0 move=0 delete=1 include=1 source=1'
-  printf, lun, 'image'
+	; write header
+	printf, lun, '# Region file format: DS9 version 4.1'
+	printf, lun, 'global dashlist=8 3 width=2 font="helvetica 10 normal roman" select=1 highlite=1 dash=0 fixed=0 edit=0 move=0 delete=1 include=1 source=1'
+	printf, lun, 'image'
 
-  for i_line=0, n_elements(uniq_lambdas)-1 do begin
+	for i_line=0, n_elements(uniq_lambdas)-1 do begin
 
-  	; the wavelength of this OH line
-  	this_lambda = uniq_lambdas[i_line]
+		; the wavelength of this OH line
+		this_lambda = uniq_lambdas[i_line]
 
-  	; select the x and y coordinates for this line
-  	w_thisline = where(speclines.lambda eq this_lambda)
-  	this_x = speclines[w_thisline].x
- 		this_y = speclines[w_thisline].y
+		; select the x and y coordinates for this line
+		w_thisline = where(speclines.lambda eq this_lambda)
+		this_x = speclines[w_thisline].x
+		this_y = speclines[w_thisline].y
 
-   	; sort points by y coordinate
-   	wsort = sort(this_y)
-   	this_x = this_x[wsort]
-   	this_y = this_y[wsort]
+		; sort points by y coordinate
+		wsort = sort(this_y)
+		this_x = this_x[wsort]
+		this_y = this_y[wsort]
 
-    ; the color for this line (red if we are using it for wavecal, otherwise blue)
-    if speclines[w_thisline[0]].trust_lambda eq 1 then color ='red' $
-      else color='blue'
+		; the color for this line (red if we are using it for wavecal, otherwise blue)
+		if speclines[w_thisline[0]].trust_lambda eq 1 then color ='red' $
+		else color='blue'
 
 		; in ds9, the first pixel is (1,1), not (0,0)
 		this_x += 1
 		this_y += 1
 
-    ; for each detection make a point region
-    for i=0, n_elements(this_x)-1 do $
-      printf, lun, 'point(' + strtrim(this_x[i], 2) + ',' + strtrim(this_y[i], 2) + ') # point=cross color = ' + color
+		; for each detection make a point region
+		for i=0, n_elements(this_x)-1 do $
+			printf, lun, 'point(' + strtrim(this_x[i], 2) + ',' + strtrim(this_y[i], 2) + ') # point=cross color = ' + color
 
-    ; for the top detection, make an extra region with the line wavelength in the text
-    !NULL = max(this_y, w_top, /nan)
-    printf, lun, 'point(' + strtrim(this_x[w_top], 2) + ',' + strtrim(this_y[w_top], 2) + $
-      ') # point=cross color = ' + color + ' text={' + cgnumber_formatter(this_lambda, decimals=5) + '}'
+		; for the top detection, make an extra region with the line wavelength in the text
+		!NULL = max(this_y, w_top, /nan)
+		printf, lun, 'point(' + strtrim(this_x[w_top], 2) + ',' + strtrim(this_y[w_top], 2) + $
+		') # point=cross color = ' + color + ' text={' + cgnumber_formatter(this_lambda, decimals=5) + '}'
 
-  endfor
+	endfor
 
-  ; close file
-  free_lun, lun
+	; close file
+	free_lun, lun
 
 
 END
@@ -80,8 +80,8 @@ END
 
 PRO flame_findlines_fitskylines, x=x, y=y, $
 	approx_wavecal=approx_wavecal, linewidth=linewidth, $
-  reflines=reflines, check_shift=check_shift, Nmin_lines=Nmin_lines, fit_window=fit_window, $
-  poly_degree=poly_degree, verbose=verbose, $
+	reflines=reflines, check_shift=check_shift, Nmin_lines=Nmin_lines, fit_window=fit_window, $
+	poly_degree=poly_degree, verbose=verbose, $
 	speclines=speclines, wavecal=wavecal, plot_title=plot_title
 
 	;
@@ -837,62 +837,62 @@ PRO flame_findlines_output_grid, fuel=fuel, wavelength_solution=wavelength_solut
 ; in such a way that it is a good fit to the observed wavelength range
 ;
 
-  ; smoothing length, in pixels
-  beta = 5
+; smoothing length, in pixels
+	beta = 5
 	if (size(wavelength_solution))[2] LE 5 then beta = 3
 
-  ; apply median filtering to the 2D wavelength solution
-  wavelength_solution_smooth = median(wavelength_solution, beta)
+	; apply median filtering to the 2D wavelength solution
+	wavelength_solution_smooth = median(wavelength_solution, beta)
 
-  ; get rid of the edge values that cannot be properly smoothed
-  wavelength_solution_smooth = wavelength_solution_smooth[beta:-1-beta, beta:-1-beta]
+	; get rid of the edge values that cannot be properly smoothed
+	wavelength_solution_smooth = wavelength_solution_smooth[beta:-1-beta, beta:-1-beta]
 
 	; find the median lambda step
- 	diff_lambda = abs( wavelength_solution_smooth - shift(wavelength_solution_smooth, 1, 0) )
- 	lambda_delta = double(median(diff_lambda))
+	diff_lambda = abs( wavelength_solution_smooth - shift(wavelength_solution_smooth, 1, 0) )
+	lambda_delta = double(median(diff_lambda))
 
- 	; round this value on a logarithmic scale - the idea here is to try
- 	; to have the same value for slightly different datasets
-  outlambda_delta = 10.0^( round(alog10(lambda_delta)*20.0d)/20.0d )
+	; round this value on a logarithmic scale - the idea here is to try
+	; to have the same value for slightly different datasets
+	outlambda_delta = 10.0^( round(alog10(lambda_delta)*20.0d)/20.0d )
 
-  ; however, this value can also be directly specified by the user
-  if fuel.settings.lambda_step GT 0.0 then begin
-    if fuel.settings.lambda_step GT 0.01 then message, 'settings.lambda_step should be specified in units of micron per pixel'
-    outlambda_delta = fuel.settings.lambda_step
-  endif
+	; however, this value can also be directly specified by the user
+	if fuel.settings.lambda_step GT 0.0 then begin
+		if fuel.settings.lambda_step GT 0.01 then message, 'settings.lambda_step should be specified in units of micron per pixel'
+		outlambda_delta = fuel.settings.lambda_step
+	endif
 
-  ; find the median wavelength of the first and last pixel
-  lambda_first_pixel = median(wavelength_solution_smooth[0,*])
-  lambda_last_pixel = median(wavelength_solution_smooth[-1,*])
+	; find the median wavelength of the first and last pixel
+	lambda_first_pixel = median(wavelength_solution_smooth[0,*])
+	lambda_last_pixel = median(wavelength_solution_smooth[-1,*])
 
-  ; number of pixels along the vertical direction
-  N_pix_y = (size(wavelength_solution))[2]
+	; number of pixels along the vertical direction
+	N_pix_y = (size(wavelength_solution))[2]
 
 	; determine the min and max values
-  ; (go a few pixel beyond the values found above, to account for tilted slits)
+	; (go a few pixel beyond the values found above, to account for tilted slits)
 	lambda_min = lambda_first_pixel - 0.5*N_pix_y*lambda_delta
 	lambda_max = lambda_last_pixel + 0.5*N_pix_y*lambda_delta
 
-  ; calculate how many pixels (at the given wavelength scale)
-  ; are between 1 micron and lambda_min
-  Npix_1um = (lambda_min-1.0) / outlambda_delta
+	; calculate how many pixels (at the given wavelength scale)
+	; are between 1 micron and lambda_min
+	Npix_1um = (lambda_min-1.0) / outlambda_delta
 
-  ; round this down to a number that is multiple of 100
-  Npix_1um_rounded = floor(Npix_1um/100.0)*100
+	; round this down to a number that is multiple of 100
+	Npix_1um_rounded = floor(Npix_1um/100.0)*100
 
-  ; take that distance from 1um as the initial wavelength for the output grid
-  outlambda_min = 1.0 + Npix_1um_rounded * outlambda_delta
+	; take that distance from 1um as the initial wavelength for the output grid
+	outlambda_min = 1.0 + Npix_1um_rounded * outlambda_delta
 
-  ; this is the number of pixels needed to get to lambda_max
-  pixel_needed = (lambda_max-outlambda_min) / outlambda_delta
+	; this is the number of pixels needed to get to lambda_max
+	pixel_needed = (lambda_max-outlambda_min) / outlambda_delta
 
-  ; round it up to a multiple of 100
-  outlambda_Npix = ceil(pixel_needed/100.0)*100
+	; round it up to a multiple of 100
+	outlambda_Npix = ceil(pixel_needed/100.0)*100
 
-  ; save output grid to the slit structure
+	; save output grid to the slit structure
 	slit.outlambda_min = outlambda_min
 	slit.outlambda_delta = outlambda_delta
-  slit.outlambda_Npix = outlambda_Npix
+	slit.outlambda_Npix = outlambda_Npix
 
 END
 
