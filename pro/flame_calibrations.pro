@@ -93,11 +93,16 @@ PRO flame_calibrations_median_combine, filenames, outfilename, vertical_shift=ve
   ; read in first frame
   first_frame = readfits(filenames[0], hdr)
 
+  ; read the type of data (long, float, etc)
+  data_type = size(first_frame, /type)
+
+	; if data type is a kind of integer, convert to float, otherwise there can be
+	; problems later
+	if (where(data_type eq [1, 2, 3, 12, 13, 14, 15]))[0] ne -1 then $
+	  first_frame = float(first_frame)
+
   ; if there is only one frame, then it's easy
   if n_elements(filenames) eq 1 then master = first_frame else begin
-
-    ; read the type of data (long, float, etc)
-    data_type = size(first_frame, /type)
 
     ; make 3D array containing all frames at once
     cube = make_array( (size(first_frame))[1], (size(first_frame))[2], n_elements(filenames), type=data_type )
