@@ -249,8 +249,8 @@ FUNCTION flame_diagnostics_fromdata, fuel
   ; identify A and B frames
   cgPs_open, fuel.util.intermediate_dir + 'startrace_identify_AB.ps', /nomatch
     for i_frame=0,fuel.util.science.n_frames-1 do begin
-       offset_pos[i_frame] = flame_diagnostics_AorB( fuel.util.science.raw_files[i_frame], fuel=fuel )
-       print, i_frame, ' ', fuel.util.science.raw_files[i_frame], ' offset position: ', offset_pos[i_frame]
+      offset_pos[i_frame] = flame_diagnostics_AorB( fuel.util.science.raw_files[i_frame], fuel=fuel )
+      print, i_frame, ' ', fuel.util.science.raw_files[i_frame], ' offset position: ', offset_pos[i_frame]
     endfor
   cgPS_close
 

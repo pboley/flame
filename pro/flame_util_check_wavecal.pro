@@ -55,27 +55,27 @@ PRO flame_util_check_wavecal, slit=slit, diagnostics=diagnostics, ascii_filename
 	; slightly perturb the frame number to improve clarity in the plot
 	line_frame_pert = line_frame + 0.1*randomn(seed, Nlines)
 
-  ; these are the values used to label the x axis
-  xtickname = strtrim(fix(diagnostics.frame_num), 2)
-  xtickv = indgen(Nfr)
-  xminor = 1
+	; these are the values used to label the x axis
+	xtickname = strtrim(fix(diagnostics.frame_num), 2)
+	xtickv = indgen(Nfr)
+	xminor = 1
 
-  ; if there are too many frames, only label some of them
-  while n_elements(xtickv) GT 18 do begin
+	; if there are too many frames, only label some of them
+	while n_elements(xtickv) GT 18 do begin
 
-    ; make the array of subindices used to select every other element
-    if n_elements(xtickname) mod 2 eq 0 then $
-      subset = 2*indgen(n_elements(xtickname)/2) else $   ; if odd
-      subset = 2*indgen((1+n_elements(xtickname))/2)      ; if even, select also the last element
+		; make the array of subindices used to select every other element
+		if n_elements(xtickname) mod 2 eq 0 then $
+			subset = 2*indgen(n_elements(xtickname)/2) else $	 ; if odd
+			subset = 2*indgen((1+n_elements(xtickname))/2)			; if even, select also the last element
 
-    ; keep only every other element for the labeling of the axis
-    xtickname = xtickname[ subset ]
-    xtickv = xtickv[ subset ]
+		; keep only every other element for the labeling of the axis
+		xtickname = xtickname[ subset ]
+		xtickv = xtickv[ subset ]
 
-    ; therefore, need to double the number of minor tick marks between two major marks
-    xminor *= 2
+		; therefore, need to double the number of minor tick marks between two major marks
+		xminor *= 2
 
-  endwhile
+	endwhile
 
 
 	; plot 1: residuals vs wavelength
@@ -91,7 +91,7 @@ PRO flame_util_check_wavecal, slit=slit, diagnostics=diagnostics, ascii_filename
 		yra=resid_range, /ysty, ytit='residuals (angstrom)', xtit='wavelength (micron)'
 
 	; identify different lines
-  uniq_lambda = line_lambda[UNIQ(line_lambda, SORT(line_lambda))]
+	uniq_lambda = line_lambda[UNIQ(line_lambda, SORT(line_lambda))]
 	uniq_res_median = fltarr(n_elements(uniq_lambda))
 	uniq_res_mad = fltarr(n_elements(uniq_lambda))
 	uniq_detections = lonarr(n_elements(uniq_lambda))
@@ -141,7 +141,7 @@ PRO flame_util_check_wavecal, slit=slit, diagnostics=diagnostics, ascii_filename
 	cgplot, line_frame_pert, line_width, psym=16, symsize=0.4, charsize=1, color='blk4', $
 		yra=width_range, /ysty, ytit='line width (raw pixels)', $
 		xra=[-1, Nfr], /xsty, xtit='frame number', $
-    xtickv=xtickv, xticks=n_elements(xtickv)-1, xtickname=xtickname, xminor=xminor
+		xtickv=xtickv, xticks=n_elements(xtickv)-1, xtickname=xtickname, xminor=xminor
 
 	; overplot median for each frame
 	for i_frame=0, Nfr-1 do begin
@@ -183,7 +183,7 @@ PRO flame_util_check_wavecal, slit=slit, diagnostics=diagnostics, ascii_filename
 		xthick=4, ythick=4, $
 		yra=resid_range, /ysty, ytit='residuals (angstrom)', $
 		xra=[-1, Nfr], /xsty, xtit='frame number', $
-    xtickv=xtickv, xticks=n_elements(xtickv)-1, xtickname=xtickname, xminor=xminor
+		xtickv=xtickv, xticks=n_elements(xtickv)-1, xtickname=xtickname, xminor=xminor
 
 	; median absolute deviation for each frame
 	mad = dblarr(Nfr)
@@ -220,8 +220,8 @@ PRO flame_util_check_wavecal, slit=slit, diagnostics=diagnostics, ascii_filename
 
 	if n_elements(ascii_filename) EQ 1 then $
 		forprint, uniq_lambda, uniq_detections, uniq_res_median, uniq_res_mad, format='F12,I12,F12.4,F12.4', $
-     	textout=ascii_filename, $
-     	comment = '# wavelength    number of detections    median residual (angstrom)    scatter (MAD, angstrom)'
+		textout=ascii_filename, $
+		comment = '# wavelength    number of detections    median residual (angstrom)    scatter (MAD, angstrom)'
 
 
 END
