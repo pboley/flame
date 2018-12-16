@@ -280,7 +280,7 @@ PRO flame_findlines_fitskylines, x=x, y=y, $
 
 	; panel 3: show the residuals
 	cgplot, speclines_trust.x, 1d4 * (speclines_trust.lambda-poly(speclines_trust.x, wavesol_coeff)), /ynozero, xra=[x[0], x[-1]], xsty=1, psym=16, color='red', symsize=0.7, $
-		ytit='residuals (' + string("305B) + ')', charsize=ch, $
+		ytit='residuals (' + string('305'OB) + ')', charsize=ch, $
 		/noerase, position = [0.15, 0.30, 0.95, 0.50], xtickformat="(A1)"
 
   if n_elements(speclines_donttrust) GT 0 then $

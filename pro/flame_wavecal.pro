@@ -393,7 +393,7 @@ PRO flame_wavecal_2D_calibration_witharcs, fuel=fuel, slit=slit, cutout=cutout, 
 
 		; panel 2: show the residuals
 		cgplot, line_meas, 1d4 * (line_meas-line_th), /ynozero, xra=[lambda1d[0], lambda1d[-1]], xsty=1, psym=16, color='red', symsize=0.7, $
-			ytit='residuals (' + string("305B) + ')', charsize=ch, $
+			ytit='residuals (' + string('305'OB) + ')', charsize=ch, $
 			/noerase, position = [0.15, 0.35, 0.95, 0.65], xtickformat="(A1)"
 
 	  cgplot, [lambda1d[0], lambda1d[-1]], [0,0], /overplot, thick=2
@@ -404,7 +404,7 @@ PRO flame_wavecal_2D_calibration_witharcs, fuel=fuel, slit=slit, cutout=cutout, 
 
 		; panel 3: plot the line widths
 		cgplot, line_meas, line_width*1d4, /ynozero, xra=[lambda1d[0], lambda1d[-1]], xsty=1, psym=16, color='red', symsize=0.7, $
-			xtit='wavelength (micron)', ytit='line width (' + string("305B) + ')', charsize=ch, $
+			xtit='wavelength (micron)', ytit='line width (' + string('305'OB) + ')', charsize=ch, $
 			/noerase, position = [0.15, 0.10, 0.95, 0.35]
 
 		; show median value of line width
