@@ -639,7 +639,7 @@ PRO flame_calibrations_oneframe, fuel, filename_raw, filename_corr, $
   if badpixel_mask NE !NULL then begin
 
     ; check that dimensions are right
-    if (size(badpixel_mask))[1] NE size_science[1] OR (size(badpixel_mask))[1] NE size_science[1] then $
+    if (size(badpixel_mask))[1] NE size_science[1] OR (size(badpixel_mask))[2] NE size_science[2] then $
     message, 'Dimensions of bad pixel mask do not match dimensions of science frame!'
 
     ; mask bad pixels
@@ -652,7 +652,7 @@ PRO flame_calibrations_oneframe, fuel, filename_raw, filename_corr, $
   if master_dark NE !NULL and fuel.settings.darksub_data then begin
 
     ; check that dimensions are right
-    if (size(master_dark))[1] NE size_science[1] OR (size(master_dark))[1] NE size_science[1] then $
+    if (size(master_dark))[1] NE size_science[1] OR (size(master_dark))[2] NE size_science[2] then $
     message, 'Dimensions of dark frame do not match dimensions of science frame!'
 
     ; subtract master dark
@@ -665,7 +665,7 @@ PRO flame_calibrations_oneframe, fuel, filename_raw, filename_corr, $
   if master_pixelflat NE !NULL and fuel.settings.flatfield_data then begin
 
     ; check that dimensions are right
-    if (size(master_pixelflat))[1] NE size_science[1] OR (size(master_pixelflat))[1] NE size_science[1] then $
+    if (size(master_pixelflat))[1] NE size_science[1] OR (size(master_pixelflat))[2] NE size_science[2] then $
     message, 'Dimensions of pixel flat do not match dimensions of science frame!'
 
     ; divide by pixel flat
