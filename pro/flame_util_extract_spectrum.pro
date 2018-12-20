@@ -10,41 +10,41 @@ PRO flame_util_extract_spectrum, filename, yrange=yrange, output_filename=output
 ;
 
 
-  ; test input
-  ; ----------------------------------------------------------------------------
+	; test input
+	; ----------------------------------------------------------------------------
 
-  ; number of input files
-  if n_elements(filename) NE 1 then message, 'Input must be one and only one filename'
+	; number of input files
+	if n_elements(filename) NE 1 then message, 'Input must be one and only one filename'
 
-  ; set the output filename
-  if ~keyword_set(output_filename) then begin
-    file_extension = (strsplit(filename, '.', /extract))[-1]
-    output_filename = flame_util_replace_string(filename, '.' + file_extension, '_spec1d.fits')
-  endif
+	; set the output filename
+	if ~keyword_set(output_filename) then begin
+		file_extension = (strsplit(filename, '.', /extract))[-1]
+		output_filename = flame_util_replace_string(filename, '.' + file_extension, '_spec1d.fits')
+	endif
 
-  if n_elements(yrange) NE 2 then message, 'yrange = [y0, y1] must be specified'
+	if n_elements(yrange) NE 2 then message, 'yrange = [y0, y1] must be specified'
 
 
-  ; read in 2D spectrum
-  ; ----------------------------------------------------------------------------
+	; read in 2D spectrum
+	; ----------------------------------------------------------------------------
 
-  ; read in 2d spectrum
-  spec2d = mrdfits(filename, 0, header, /silent)
+	; read in 2d spectrum
+	spec2d = mrdfits(filename, 0, header, /silent)
 
-  ; read in 2d theoretical error spectrum
-  err2d = mrdfits(filename, 1, /silent)
+	; read in 2d theoretical error spectrum
+	err2d = mrdfits(filename, 1, /silent)
 
 	; read in 2d empirical error spectrum
 	sig2d = mrdfits(filename, 2, /silent)
 
 	; read in 2d sky
-  sky2d = mrdfits(filename, 3, /silent)
+	sky2d = mrdfits(filename, 3, /silent)
 
-  ; create ivar images
-  ivar2d_th = 1d/err2d^2
+	; create ivar images
+	ivar2d_th = 1d/err2d^2
 	ivar2d_emp = 1d/sig2d^2
 
-  ; read in wavelength axis
+	; read in wavelength axis
 	lambda_unit = strlowcase( strtrim(sxpar(header, 'CUNIT1'), 2) )
 	lambda_1d = sxpar(header,'CRVAL1') + (findgen(sxpar(header,'NAXIS1')) - sxpar(header,'CRPIX1') + 1d) * sxpar(header,'CDELT1')
 
@@ -53,29 +53,29 @@ PRO flame_util_extract_spectrum, filename, yrange=yrange, output_filename=output
 		lambda_1d /= 1e4 $
 	else if lambda_unit ne 'micron' then message, lambda_unit + ' not supported!'
 
-  ; spatial axis
-  y_1d = findgen(sxpar(header,'NAXIS2'))
+	; spatial axis
+	y_1d = findgen(sxpar(header,'NAXIS2'))
 
 	; obtain the median profile
-  profile = median(spec2d, dimension=1)
+	profile = median(spec2d, dimension=1)
 
 
 	; boxcar extraction
-  ; ----------------------------------------------------------------------------
+	; ----------------------------------------------------------------------------
 
 	; define boxcar aperture (include also pixels at the edge)
 	w_boxcar = where( y_1d GE min(yrange) and y_1d LE max(yrange), /null )
 
-  ; calculate boxcar extraction
-  spec1d_boxcar = total(spec2d[*,w_boxcar], 2, /nan)
-  ivar1d_boxcar = 1. / total(1./ivar2d_th[*,w_boxcar], 2, /nan)
+	; calculate boxcar extraction
+	spec1d_boxcar = total(spec2d[*,w_boxcar], 2, /nan)
+	ivar1d_boxcar = 1. / total(1./ivar2d_th[*,w_boxcar], 2, /nan)
 	ivar1d_boxcar_emp = 1. / total(1./ivar2d_emp[*,w_boxcar], 2, /nan)
 
 	; boxcar extraction for the sky
 	sky2d_boxcar = sky2d[*,w_boxcar]
-  sky1d_boxcar = total(sky2d_boxcar, 2, /nan)
+	sky1d_boxcar = total(sky2d_boxcar, 2, /nan)
 
-  ; make nice output structure
+	; make nice output structure
 	output_structure = { $
 		lambda: lambda_1d, $
 		flux: spec1d_boxcar, $
@@ -92,7 +92,7 @@ PRO flame_util_extract_spectrum, filename, yrange=yrange, output_filename=output
 
 	; make new FITS header, with units
 	header_output = header
- 	sxdelpar, header_output, 'naxis'
+	sxdelpar, header_output, 'naxis'
 	sxdelpar, header_output, 'naxis1'
 	sxdelpar, header_output, 'naxis2'
 	sxdelpar, header_output, 'bitpix'
@@ -103,7 +103,7 @@ PRO flame_util_extract_spectrum, filename, yrange=yrange, output_filename=output
 	mwrfits, output_structure, output_filename, header_output, /create
 
 	print, ''
-  print, '1D spectrum extracted: ' + output_filename
+	print, '1D spectrum extracted: ' + output_filename
 	print, ''
 
 

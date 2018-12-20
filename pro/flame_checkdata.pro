@@ -45,7 +45,7 @@ END
 PRO flame_checkdata_skycontinuum, fuel, lambda1d, spec1d
 
 	; load sky model
-  readcol, fuel.settings.sky_emission_filename, model_lambda, model_flux	; lambda in micron
+	readcol, fuel.settings.sky_emission_filename, model_lambda, model_flux	; lambda in micron
 
 	; trim to the wavelength of interest
 	w_touse = where(model_lambda GT lambda1d[0] and model_lambda LT lambda1d[-1], /null)
@@ -58,9 +58,9 @@ PRO flame_checkdata_skycontinuum, fuel, lambda1d, spec1d
 	; resample model onto the observed wavelength grid
 	model_flux_resampled = interpol( model_flux, model_lambda, lambda1d)
 
-  ; clean observed spectrum from NaNs because they don't work with the cross correlation
-  spec1d_clean = spec1d
-  spec1d_clean[ where(~finite(spec1d), /null) ] = 0.0
+	; clean observed spectrum from NaNs because they don't work with the cross correlation
+	spec1d_clean = spec1d
+	spec1d_clean[ where(~finite(spec1d), /null) ] = 0.0
 
 	; determine the region in common between model and observed spectrum
 	w_incommon = where( median( spec1d_clean * model_flux_resampled, 15) GT 0.0, /null)
@@ -94,10 +94,10 @@ PRO flame_checkdata_skycontinuum, fuel, lambda1d, spec1d
 		bin_obs_up = median(bin_obs_up, 50) / median(bin_obs_up)
 
 		; measure the local shift between observed and model spectrum
-	  lag = indgen(100)-50 ; up to 5 pixels each direction
-	  crosscorr = c_correlate( bin_obs_up, bin_model_up, lag)
-	  max_crosscorr = max( crosscorr, max_ind, /nan)
-	  delta = -lag[max_ind] * (lambda1d[1]-lambda1d[0])/10.0
+		lag = indgen(100)-50 ; up to 5 pixels each direction
+		crosscorr = c_correlate( bin_obs_up, bin_model_up, lag)
+		max_crosscorr = max( crosscorr, max_ind, /nan)
+		delta = -lag[max_ind] * (lambda1d[1]-lambda1d[0])/10.0
 
 		; show the shifted spectra
 		cgplot, bin_lambda_up, bin_model_up, color='red', thick=3, xtit='wavelength (micron)', $
@@ -139,7 +139,7 @@ PRO flame_checkdata_sky, fuel, i_slit=i_slit
 
 	; filename of the output sky stack
 	skystack_filename = fuel.util.output_dir + 'spec2d' + path_sep() + $
-	 	fuel.slits[i_slit].output_file
+		fuel.slits[i_slit].output_file
 
 	; load the sky spectrum
 	sky_spec2d = mrdfits(skystack_filename, 3, header, /silent)
@@ -149,7 +149,7 @@ PRO flame_checkdata_sky, fuel, i_slit=i_slit
 	sky_spec =  median(sky_spec2d, dimension=2)
 
 	; get the wavelength calibration from the header
- 	lambda_unit = strlowcase( strtrim(sxpar(header, 'CUNIT1'), 2) )
+	lambda_unit = strlowcase( strtrim(sxpar(header, 'CUNIT1'), 2) )
 	lambda_axis = sxpar(header, 'CRVAL1') + sxpar(header,'CDELT1') * $
 		( findgen(sxpar(header,'NAXIS1')) )
 
@@ -180,9 +180,9 @@ PRO flame_checkdata_sky, fuel, i_slit=i_slit
 
 	; make sure there are sky lines here
 	if w_lines EQ !NULL then begin
-    print, 'Warning: wavelength range does not contain sky lines'
+		print, 'Warning: wavelength range does not contain sky lines'
 		return
-  endif
+	endif
 
 	; keep only the OH lines of interest
 	line_list = line_list[w_lines]
@@ -201,8 +201,8 @@ PRO flame_checkdata_sky, fuel, i_slit=i_slit
 		; check that the region is within the observed range
 		if w_fit eq !NULL then continue
 
-    ; check that there actually is signal and it's not just a bunch of NaNs
-    if n_elements( where( finite(sky_spec[w_fit]), /null ) ) LE 5 then continue
+		; check that there actually is signal and it's not just a bunch of NaNs
+		if n_elements( where( finite(sky_spec[w_fit]), /null ) ) LE 5 then continue
 
 		; error handling for the gaussian fitting
 		catch, error_gaussfit
@@ -340,10 +340,10 @@ PRO flame_checkdata, fuel
 			catch, error_status
 			if error_status ne 0 then begin
 				print, ''
-		    print, '**************************'
-		    print, '***       WARNING      ***'
-		    print, '**************************'
-		    print, 'Error found. Skipping slit ' + strtrim(fuel.slits[i_slit].number,2), ' - ', fuel.slits[i_slit].name
+				print, '**************************'
+				print, '***       WARNING      ***'
+				print, '**************************'
+				print, 'Error found. Skipping slit ' + strtrim(fuel.slits[i_slit].number,2), ' - ', fuel.slits[i_slit].name
 				fuel.slits[i_slit].skip = 1
 				cgPS_close
 				catch, /cancel
@@ -369,11 +369,11 @@ PRO flame_checkdata, fuel
 
 	; save fuel structure to output directory
 	filename = fuel.util.output_dir + 'fuel.sav'
-  save, fuel, filename=filename
-  print, 'fuel structure saved to ' + filename
+	save, fuel, filename=filename
+	print, 'fuel structure saved to ' + filename
 
 
-  flame_util_module_end, fuel
+	flame_util_module_end, fuel
 
 
 END

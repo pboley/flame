@@ -22,7 +22,7 @@ PRO flame_extract_slit, fuel, slit, skysub=skysub
 	extraction_dir = fuel.util.output_dir + 'spec1d' + skysub_string + path_sep()
 
 	; if needed, create extraction directory in the output directory
-  if ~file_test(extraction_dir) then file_mkdir, extraction_dir
+	if ~file_test(extraction_dir) then file_mkdir, extraction_dir
 
 	; read data and make spatial profile
 	; ----------------------------------------------------------------------------
@@ -33,20 +33,20 @@ PRO flame_extract_slit, fuel, slit, skysub=skysub
 	; output file to be used for the extraction
 	filename_spec2d = spec2d_dir + slit.output_combined_file
 
-  ; read in 2d spectrum
-  spec2d = mrdfits(filename_spec2d, 0, header, /silent)
+	; read in 2d spectrum
+	spec2d = mrdfits(filename_spec2d, 0, header, /silent)
 
-  ; read in 2d theoretical error spectrum
-  err2d = mrdfits(filename_spec2d, 1, /silent)
+	; read in 2d theoretical error spectrum
+	err2d = mrdfits(filename_spec2d, 1, /silent)
 
 	; read in 2d empirical error spectrum
 	sig2d = mrdfits(filename_spec2d, 2, /silent)
 
 	; read in 2d sky
-  sky2d = mrdfits(filename_spec2d, 3, /silent)
+	sky2d = mrdfits(filename_spec2d, 3, /silent)
 
-  ; create ivar images
-  ivar2d_th = 1d/err2d^2
+	; create ivar images
+	ivar2d_th = 1d/err2d^2
 	ivar2d_emp = 1d/sig2d^2
 
   ; read in wavelength axis
@@ -58,11 +58,11 @@ PRO flame_extract_slit, fuel, slit, skysub=skysub
 		lambda_1d /= 1e4 $
 	else if lambda_unit ne 'micron' then message, lambda_unit + ' not supported!'
 
-  ; spatial axis
-  y_1d = findgen(sxpar(header,'NAXIS2'))
+	; spatial axis
+	y_1d = findgen(sxpar(header,'NAXIS2'))
 
 	; obtain the median profile
-  profile = median(spec2d, dimension=1)
+	profile = median(spec2d, dimension=1)
 
 	; show spatial profile
 	cgplot, y_1d, profile, charsize=1, $
@@ -98,19 +98,19 @@ PRO flame_extract_slit, fuel, slit, skysub=skysub
 	profile_residuals = profile - gaussian_model
 	w_trace = where( abs(y_1d-gauss_param[1]) LT 5.0*gauss_param[2], /null)
 	if w_trace EQ !NULL then $
-	 	profile_rms = stddev(profile_residuals, /nan) else $
+		profile_rms = stddev(profile_residuals, /nan) else $
 		profile_rms = stddev(profile_residuals[w_trace], /nan)
 
 	if ~finite(chisq) or chisq LE 0.0 or  $			; check that chi square makes sense
 		gauss_param[0] LE 0.0 or $	; check that the peak of the Gaussian is positive
 		gauss_param[0] LT 5.0*gauss_err[0] or $ 	; check that the SNR is high
 		gauss_param[0] LT 5.0*profile_rms or $ 	; check that the peak is high compared to the noise in the profile
-	 	gauss_param[1] LT min(y_1d) or gauss_param[1] GT max(y_1d) or $ 			; check that the center of the Guassian is in the observed range
+		gauss_param[1] LT min(y_1d) or gauss_param[1] GT max(y_1d) or $ 			; check that the center of the Guassian is in the observed range
 		gauss_param[2] LT 0.1 or gauss_param[2] GT n_elements(profile) $		 	; check that the Gaussian width makes sense
 		then begin
 			print, ''
 			print, 'slit ' + string(slit.number, format='(I03)') + ' - ' + slit.name + $
-				 skysub_string + ': no object was detected'
+				skysub_string + ': no object was detected'
 			print, ''
 			cgPS_close
 			return
@@ -132,21 +132,21 @@ PRO flame_extract_slit, fuel, slit, skysub=skysub
 	; define boxcar aperture (round up to include all relevant pixels)
 	w_boxcar = where( abs(y_1d-gauss_param[1]) LT 2.0*gauss_param[2]+0.49, /null )
 
-  ; calculate boxcar extraction
-  spec1d_boxcar = total(spec2d[*,w_boxcar], 2, /nan)
-  ivar1d_boxcar = 1. / total(1./ivar2d_th[*,w_boxcar], 2, /nan)
+	; calculate boxcar extraction
+	spec1d_boxcar = total(spec2d[*,w_boxcar], 2, /nan)
+	ivar1d_boxcar = 1. / total(1./ivar2d_th[*,w_boxcar], 2, /nan)
 	ivar1d_boxcar_emp = 1. / total(1./ivar2d_emp[*,w_boxcar], 2, /nan)
 
 	; boxcar extraction for the sky
 	sky2d_boxcar = sky2d[*,w_boxcar]
-  sky1d_boxcar = total(sky2d_boxcar, 2, /nan)
+	sky1d_boxcar = total(sky2d_boxcar, 2, /nan)
 
 	; plot extracted spectrum
 	xrange = [min(lambda_1d, /nan), max(lambda_1d, /nan)]
 	cgplot, lambda_1d, median(spec1d_boxcar, 7), $
 		charsize=1, xtitle='Wavelength (um)', ytitle='Boxcar-extracted flux', $
 		title = 'black: observed flux, blue; observed uncertainty', xrange=xrange, /xstyle
- 	cgplot, lambda_1d, 1.0/sqrt(ivar1d_boxcar), /overplot, color='blue'
+	cgplot, lambda_1d, 1.0/sqrt(ivar1d_boxcar), /overplot, color='blue'
 
 
 	; optimal extraction
@@ -167,9 +167,9 @@ PRO flame_extract_slit, fuel, slit, skysub=skysub
 	weight2d = replicate(1, (size(spec2d))[1] ) # weight1d
 
 	; optimal extraction
-  spec1d_optimal = total(weight2d*ivar2d_th*spec2d, 2, /nan) / total(weight2d^2*ivar2d_th, 2, /nan)
-  ivar1d_optimal = total(weight2d^2*ivar2d_th, 2, /nan)
-  ivar1d_optimal_emp = total(weight2d^2*ivar2d_emp, 2, /nan)
+	spec1d_optimal = total(weight2d*ivar2d_th*spec2d, 2, /nan) / total(weight2d^2*ivar2d_th, 2, /nan)
+	ivar1d_optimal = total(weight2d^2*ivar2d_th, 2, /nan)
+	ivar1d_optimal_emp = total(weight2d^2*ivar2d_emp, 2, /nan)
 
 	; optimal extraction of the sky
 	sky1d_optimal = total(weight2d*sky2d, 2, /nan) / total(weight2d^2, 2, /nan)
@@ -178,7 +178,7 @@ PRO flame_extract_slit, fuel, slit, skysub=skysub
 	cgplot, lambda_1d, median(spec1d_optimal, 7), $
 		charsize=1, xtitle='Wavelength (um)', ytitle='Optimally extracted flux', $
 		title = 'black: observed flux, blue; observed uncertainty', xrange=xrange, /xstyle
- 	cgplot, lambda_1d, 1.0/sqrt(ivar1d_optimal), /overplot, color='blue'
+	cgplot, lambda_1d, 1.0/sqrt(ivar1d_optimal), /overplot, color='blue'
 
 
 	; compare SNR
@@ -222,7 +222,7 @@ PRO flame_extract_slit, fuel, slit, skysub=skysub
 			sky: sky1d_optimal }
 
 	; output boxcar extraction
-endif else begin
+	endif else begin
 
 		; filename for the output file
 		filename = extraction_dir + 'spec1d.boxcar.' + string(slit.number, format='(I03)') + '.' + slit.output_combined_file
@@ -242,7 +242,7 @@ endif else begin
 
 	; make new FITS header, with units
 	header_output = header
- 	sxdelpar, header_output, 'naxis'
+	sxdelpar, header_output, 'naxis'
 	sxdelpar, header_output, 'naxis1'
 	sxdelpar, header_output, 'naxis2'
 	sxdelpar, header_output, 'bitpix'
@@ -254,7 +254,7 @@ endif else begin
 
 	print, ''
 	print, 'slit ' + string(slit.number, format='(I03)') + ' - ' + slit.name + $
-		 skysub_string + ': 1D spectrum extracted'
+		skysub_string + ': 1D spectrum extracted'
 	print, filename
 	print, ''
 
@@ -285,10 +285,10 @@ PRO flame_extract, fuel
 			catch, error_status
 			if error_status ne 0 then begin
 				print, ''
-		    print, '**************************'
-		    print, '***       WARNING      ***'
-		    print, '**************************'
-		    print, 'Error found. Skipping slit ' + strtrim(fuel.slits[i_slit].number,2), ' - ', fuel.slits[i_slit].name
+				print, '**************************'
+				print, '***       WARNING      ***'
+				print, '**************************'
+				print, 'Error found. Skipping slit ' + strtrim(fuel.slits[i_slit].number,2), ' - ', fuel.slits[i_slit].name
 				fuel.slits[i_slit].skip = 1
 				catch, /cancel
 				continue
@@ -314,10 +314,10 @@ PRO flame_extract, fuel
 	print, 'fuel structure saved to ' + filename
 
 
-  flame_util_module_end, fuel
+	flame_util_module_end, fuel
 
 
-  print, '-------------------------------------'
+	print, '-------------------------------------'
 	print, '-------------------------------------'
 	print, '-------------------------------------'
 

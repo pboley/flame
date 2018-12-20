@@ -115,10 +115,10 @@ PRO flame_rectify, fuel
 			catch, error_status
 			if error_status ne 0 then begin
 				print, ''
-		    print, '**************************'
-		    print, '***       WARNING      ***'
-		    print, '**************************'
-		    print, 'Error found. Skipping slit ' + strtrim(fuel.slits[i_slit].number,2), ' - ', fuel.slits[i_slit].name
+				print, '**************************'
+				print, '***       WARNING      ***'
+				print, '**************************'
+				print, 'Error found. Skipping slit ' + strtrim(fuel.slits[i_slit].number,2), ' - ', fuel.slits[i_slit].name
 				fuel.slits[i_slit].skip = 1
 				catch, /cancel
 				continue
@@ -153,6 +153,6 @@ PRO flame_rectify, fuel
 	endfor
 
 
-  flame_util_module_end, fuel
+	flame_util_module_end, fuel
 
 END

@@ -33,7 +33,7 @@ PRO flame_combine_stack, fuel=fuel, filenames=filenames, sky_filenames=sky_filen
 
 	; check that, if present, the sky frames are in the correct number
 	if n_elements(sky_filenames) NE 0 and n_elements(sky_filenames) NE N_frames then $
-	 	message, 'sky_filenames: wrong number of frames'
+		message, 'sky_filenames: wrong number of frames'
 
 
 	; construct the grid for the output image
@@ -336,11 +336,11 @@ PRO flame_combine_oneslit, i_slit=i_slit, fuel=fuel, skysub=skysub
 
 	; output directory
 	if keyword_set(skysub) then $
-	 	output_dir = fuel.util.output_dir + 'spec2d_skysub' + path_sep() else $
+		output_dir = fuel.util.output_dir + 'spec2d_skysub' + path_sep() else $
 		output_dir = fuel.util.output_dir + 'spec2d' + path_sep()
 
 	; create output directory if it does not exist
-  if file_test(output_dir) eq 0 then file_mkdir, output_dir
+	if file_test(output_dir) eq 0 then file_mkdir, output_dir
 
 	; prefix for output file names (excluding directory path)
 	filename_prefix = 'slit' + $
@@ -456,27 +456,27 @@ END
 
 PRO flame_combine_twoslits, i_slit, j_slit, fuel=fuel, output_dir=output_dir
 
-		; note: the A-B of the i_slit is always combined with the B-A of the j_slit
+	; note: the A-B of the i_slit is always combined with the B-A of the j_slit
 
-		print, ''
-		print, 'Combining slit ' + strtrim(fuel.slits[i_slit].number, 2) + ' - ' + fuel.slits[i_slit].name + $
-			' with slit ' + strtrim(fuel.slits[j_slit].number, 2) + ' - ' + fuel.slits[j_slit].name
+	print, ''
+	print, 'Combining slit ' + strtrim(fuel.slits[i_slit].number, 2) + ' - ' + fuel.slits[i_slit].name + $
+		' with slit ' + strtrim(fuel.slits[j_slit].number, 2) + ' - ' + fuel.slits[j_slit].name
 
-		; prefix for file names
-		filename_prefix_i = output_dir + 'slit' + string(fuel.slits[i_slit].number, format='(I02)') + $
-		 	'-' + fuel.slits[i_slit].name
-		filename_prefix_j = output_dir + 'slit' + string(fuel.slits[j_slit].number, format='(I02)') + $
-		 	'-' + fuel.slits[j_slit].name
+	; prefix for file names
+	filename_prefix_i = output_dir + 'slit' + string(fuel.slits[i_slit].number, format='(I02)') + $
+		'-' + fuel.slits[i_slit].name
+	filename_prefix_j = output_dir + 'slit' + string(fuel.slits[j_slit].number, format='(I02)') + $
+		'-' + fuel.slits[j_slit].name
 
-		; combine the A-B stacks
-		filenames = [filename_prefix_i + '_A-B.fits', filename_prefix_j + '_B-A.fits']
-		outname =  'slit' + string(fuel.slits[i_slit].number, format='(I02)') + '+slit' + $
-			string(fuel.slits[j_slit].number, format='(I02)') + '.fits'
-		flame_util_combine_spectra, filenames, output_filename = output_dir + outname, /nan, /useweights, /rectified_frame
+	; combine the A-B stacks
+	filenames = [filename_prefix_i + '_A-B.fits', filename_prefix_j + '_B-A.fits']
+	outname =  'slit' + string(fuel.slits[i_slit].number, format='(I02)') + '+slit' + $
+		string(fuel.slits[j_slit].number, format='(I02)') + '.fits'
+	flame_util_combine_spectra, filenames, output_filename = output_dir + outname, /nan, /useweights, /rectified_frame
 
-		; update the file name of the final *combined* output
-		fuel.slits[i_slit].output_combined_file = outname
-		fuel.slits[j_slit].output_combined_file = outname
+	; update the file name of the final *combined* output
+	fuel.slits[i_slit].output_combined_file = outname
+	fuel.slits[j_slit].output_combined_file = outname
 
 END
 
@@ -518,7 +518,7 @@ PRO flame_combine_multislit, fuel=fuel
 
 	; make plot that shows slit pairing
 	cgplot, [0], /nodata, xra=[0, 2.2], /xstyle, $
-	 	yra= [ min(slit_bottom)-1.2*abs(dithering_length), max(slit_top)+1.2*abs(dithering_length)], $
+		yra= [ min(slit_bottom)-1.2*abs(dithering_length), max(slit_top)+1.2*abs(dithering_length)], $
 		ytit='pixel position along the vertical direction', charsize=1, xtickformat='(A1)', xticks=1
 
 	; for each slit show their name and position on the detector
@@ -592,7 +592,7 @@ PRO flame_combine_multislit, fuel=fuel
 
 		endif else begin
 
-		 	i_slit = (array_indices(overlap_coefficient, ind2d))[0]
+			i_slit = (array_indices(overlap_coefficient, ind2d))[0]
 			j_slit = (array_indices(overlap_coefficient, ind2d))[1]
 
 		endelse
@@ -771,7 +771,7 @@ PRO flame_combine, fuel
 		flame_util_module_start, fuel, 'flame_combine'
 
 
- 	; loop through all slits
+	; loop through all slits
 	for i_slit=0, n_elements(fuel.slits)-1 do begin
 
 		if fuel.slits[i_slit].skip then continue
@@ -784,10 +784,10 @@ PRO flame_combine, fuel
 			catch, error_status
 			if error_status ne 0 then begin
 				print, ''
-		    print, '**************************'
-		    print, '***       WARNING      ***'
-		    print, '**************************'
-		    print, 'Error found. Skipping slit ' + strtrim(fuel.slits[i_slit].number,2), ' - ', fuel.slits[i_slit].name
+				print, '**************************'
+				print, '***       WARNING      ***'
+				print, '**************************'
+				print, 'Error found. Skipping slit ' + strtrim(fuel.slits[i_slit].number,2), ' - ', fuel.slits[i_slit].name
 				fuel.slits[i_slit].skip = 1
 				catch, /cancel
 				continue
@@ -805,14 +805,14 @@ PRO flame_combine, fuel
 	if fuel.input.AB_subtraction then flame_combine_multislit, fuel=fuel
 
 	; combine the SNR map of all slits that were reduced into one large FITS file
- 	flame_combine_mosaic, fuel
+	flame_combine_mosaic, fuel
 	if fuel.settings.skysub then $
 		flame_combine_mosaic, fuel, /skysub
 
 	; save fuel structure to output directory
 	filename = fuel.util.output_dir + 'fuel.sav'
-  save, fuel, filename=filename
-  print, 'fuel structure saved to ' + filename
+	save, fuel, filename=filename
+	print, 'fuel structure saved to ' + filename
 
 
 	flame_util_module_end, fuel
