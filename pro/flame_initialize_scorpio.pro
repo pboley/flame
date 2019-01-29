@@ -92,8 +92,8 @@ FUNCTION flame_initialize_scorpio, input
 	if array_equal(fuel.settings.trim_slit, [0,0]) then begin
 		case grating_name of
 			'VPHG550G': BEGIN
-	fuel.settings.trim_slit = [300, 2067]
-	linelist_arc = fuel.util.flame_data_dir + 'Scorpio/VPHG550G.dat'
+				fuel.settings.trim_slit = [300, 2067]
+				linelist_arc = fuel.util.flame_data_dir + 'Scorpio/VPHG550G.dat'
 			END
 			else: message, grating_name, ' not supported'
 		endcase
