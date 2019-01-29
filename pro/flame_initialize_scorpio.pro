@@ -87,6 +87,7 @@ FUNCTION flame_initialize_scorpio, input
 	slits = flame_initialize_scorpio_longslit(science_header, instrument, input)
 	disperser = strtrim(fxpar(science_header, 'DISPERSE'), 2)
 	grating_name = (strsplit(disperser, /extract))[0]
+	fuel.settings.angstroms = 1 ; default to angstroms
 
 	; Set trim region and linelist based on grating
 	if array_equal(fuel.settings.trim_slit, [0,0]) then begin
